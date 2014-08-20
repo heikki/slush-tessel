@@ -1,0 +1,46 @@
+{
+  "name": "slush-tessel",
+  "description": "A slush generator for Tessel projects",
+  "version": "0.1.0",
+  "homepage": "https://github.com/heikki/slush-tessel",
+  "author": {
+    "name": "Heikki Ylönen",
+    "email": "heikki74@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/heikki/slush-tessel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/heikki/slush-tessel/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/heikki/slush-tessel/blob/master/LICENSE"
+    }
+  ],
+  "main": "slushfile.js",
+  "engines": {
+    "node": ">= 0.10.26",
+    "npm": ">=1.4.3"
+  },
+  "scripts": {
+    "test": "echo \"No tests\""
+  },
+  "dependencies": {
+    "gulp-conflict": "^0.1.2",
+    "gulp-template": "^0.1.2",
+    "gulp-install": "^0.1.8",
+    "gulp-util": "^2.2.20",
+    "inquirer": "^0.5.1",
+    "underscore.string": "^2.3.3",
+    "gulp": "^3.8.7"
+  },
+  "keywords": [
+    "gulp",
+    "slushgenerator",
+    "tessel",
+    "tesselate"
+  ]
+}
