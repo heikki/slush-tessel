@@ -2,7 +2,7 @@
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var install = require('gulp-install');
+var spawn = require('child_process').spawn;
 var conflict = require('gulp-conflict');
 var template = require('gulp-template');
 var _s = require('underscore.string');
@@ -82,18 +82,17 @@ gulp.task('default', function(done) {
 			.pipe(template(vars))
 			.pipe(conflict('./'))
 			.pipe(gulp.dest('./'))
-			.pipe(install())
 			.on('finish', function() {
-				done();
+				if (process.argv.indexOf('--skip-install') === -1) {
+					gutil.log('Installing...');
+					spawn('npm', ['install'], { stdio: 'inherit' }).on('close', function(code) {
+						if (code === 0) {
+							done();
+							console.log(gutil.colors.green('\nDONE! Connect your Tessel and try running \'gulp run\'\n'));
+						}
+					});
+				}
 			});
-
-		var skipInstall = process.argv.slice(2).indexOf('--skip-install') >= 0;
-
-		if (!skipInstall) {
-			process.on('exit', function() {
-				console.log(gutil.colors.green('\nDONE! Connect your Tessel and try running \'gulp run\'\n'));
-			});
-		}
 
 	});
 });
