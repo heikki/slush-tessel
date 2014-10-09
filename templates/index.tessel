@@ -1,0 +1,9 @@
+var tessel = require('tessel');
+
+tessel.led[0].output(0);
+tessel.led[1].output(1);
+
+setInterval(function() {
+	tessel.led[0].toggle();
+	tessel.led[1].toggle();
+}, 100);

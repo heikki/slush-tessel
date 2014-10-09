@@ -1,0 +1,20 @@
+var tesselate = require('tesselate');
+
+var config = {
+	modules: {<% modules.forEach(function(module, index, arr) { %>
+		<%= module.port %>: <% if (module.name) { %>['<%= module.name %>', '<%= module.abbr %>']<% } else { %>null<% } %><% if (index < arr.length - 1) { %>,<% } %><% }) %>
+	},
+	development: true
+};
+
+tesselate(config, function(tessel, m) {
+
+	tessel.led[0].output(0);
+	tessel.led[1].output(1);
+
+	setInterval(function() {
+		tessel.led[0].toggle();
+		tessel.led[1].toggle();
+	}, 100);
+
+});

@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var conflict = require('gulp-conflict');
 var template = require('gulp-template');
 var inquirer = require('inquirer');
+var rename = require('gulp-rename');
 var path = require('path');
 var _ = require('underscore.string');
 var npm = require('npm');
@@ -61,6 +62,13 @@ gulp.task('default', function(done) {
 
 	questions.push({
 		type: 'confirm',
+		name: 'tesselate',
+		message: 'Use tesselate for module loading?',
+		default: false
+	});
+
+	questions.push({
+		type: 'confirm',
 		name: 'moveon',
 		message: 'Continue?'
 	});
@@ -82,10 +90,26 @@ gulp.task('default', function(done) {
 			return answers[port];
 		}).filter(function(value, index, self) {
 			return value && self.indexOf(value) === index;
-		}).concat('tesselate').sort();
+		});
 
-		gulp.src(__dirname + '/templates/**')
+		if (answers.tesselate) {
+			answers.dependencies.push('tesselate');
+		}
+
+		answers.dependencies.sort();
+
+		var glob = [
+			__dirname + '/templates/*.{json,md}',
+			__dirname + '/templates/index.' + (answers.tesselate ? 'tesselate' : 'tessel')
+		];
+
+		gulp.src(glob)
 			.pipe(template(answers))
+			.pipe(rename(function(file) {
+				if (file.basename === 'index') {
+					file.extname = '.js';
+				}
+			}))
 			.pipe(conflict('./'))
 			.pipe(gulp.dest('./'))
 			.on('finish', function() {
