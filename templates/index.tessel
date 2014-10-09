@@ -1,9 +1,18 @@
-var tessel = require('tessel');
+var tessel = require('tessel');<% modules.filter(function(module) { return module.name !== false; }).forEach(function(module) { %>
+var <%= module.abbr %> = require('<%= module.name %>').use(tessel.port.<%= module.port %>);<% }) %>
 
-tessel.led[0].output(0);
-tessel.led[1].output(1);
+var led1 = tessel.led[0].output(1);
+var led2 = tessel.led[1].output(0);
 
 setInterval(function() {
-	tessel.led[0].toggle();
-	tessel.led[1].toggle();
-}, 100);
+	led1.toggle();
+	led2.toggle();
+}, 100);<% modules.filter(function(module) { return module.name !== false; }).forEach(function(module) { %>
+
+<%= module.abbr %>.on('ready', function() {
+	console.log('<%= module.abbr %> is ready');
+});
+
+<%= module.abbr %>.on('error', function(err) {
+	console.log('<%= module.abbr %>', err);
+});<% }) %>

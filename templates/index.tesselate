@@ -9,12 +9,12 @@ var config = {
 
 tesselate(config, function(tessel, m) {
 
-	tessel.led[0].output(0);
-	tessel.led[1].output(1);
+	var led1 = tessel.led[0].output(1);
+	var led2 = tessel.led[1].output(0);
 
 	setInterval(function() {
-		tessel.led[0].toggle();
-		tessel.led[1].toggle();
+		led1.toggle();
+		led2.toggle();
 	}, 100);
 
 });

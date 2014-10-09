@@ -81,9 +81,18 @@ gulp.task('default', function(done) {
 
 		answers.slug = _.slugify(answers.name);
 
+		var moduleTypeCount = ports.reduce(function(memo, port) {
+			var name = answers[port];
+			if (name) {
+				memo[name] = memo[name] ? memo[name] + 1 : 1;
+			}
+			return memo;
+		}, {});
+
 		answers.modules = ports.map(function(port) {
 			var name = answers[port];
-			return { port: port, name: name, abbr: modules[name] };
+			var abbr = (name && moduleTypeCount[name] > 1) ? modules[name] + port : modules[name];
+			return { port: port, name: name, abbr: abbr };
 		});
 
 		answers.dependencies = ports.map(function(port) {
