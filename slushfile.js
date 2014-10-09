@@ -1,13 +1,12 @@
 'use strict';
 
 var gulp = require('gulp');
-var gutil = require('gulp-util');
-var spawn = require('child_process').spawn;
 var conflict = require('gulp-conflict');
 var template = require('gulp-template');
-var _s = require('underscore.string');
 var inquirer = require('inquirer');
 var path = require('path');
+var _ = require('underscore.string');
+var npm = require('npm');
 
 var ports = ['A', 'B', 'C', 'D'];
 
@@ -29,24 +28,42 @@ var modules = {
 	'servo-pca9685'  : 'servo'
 };
 
-var choices = [{ name: '[ empty ]', value: false }].concat(Object.keys(modules));
-
-var questions = ports.map(function(port) {
-	return {
-		type: 'list',
-		name: port,
-		message: 'Port ' + port,
-		choices: choices
-	};
-}).concat({
-	type: 'confirm',
-	name: 'moveon',
-	message: 'Continue?'
+gulp.task('npm-install', function(done) {
+	npm.load(function() {
+		npm.commands.install(function(error) {
+			if (error) {
+				console.log('npm', error.message);
+				return;
+			}
+			done();
+		});
+	});
 });
 
 gulp.task('default', function(done) {
 
-	gutil.log('Choose your modules:');
+	var choices = [{ name: '[ empty ]', value: false }].concat(Object.keys(modules));
+
+	var questions = [{
+		name: 'name',
+		message: 'Name of project',
+		default: _.humanize(path.basename(process.cwd()))
+	}];
+
+	ports.forEach(function(port) {
+		questions.push({
+			type: 'list',
+			name: port,
+			message: 'Port ' + port + ' module',
+			choices: choices
+		});
+	});
+
+	questions.push({
+		type: 'confirm',
+		name: 'moveon',
+		message: 'Continue?'
+	});
 
 	inquirer.prompt(questions, function(answers) {
 
@@ -54,44 +71,25 @@ gulp.task('default', function(done) {
 			return done();
 		}
 
-		var vars = {};
+		answers.slug = _.slugify(answers.name);
 
-		vars.slug = _s.slugify(path.basename(process.cwd()).replace(/[^\w\s]+?/g, ' '));
-
-		vars.modules = ports.map(function(port) {
+		answers.modules = ports.map(function(port) {
 			var name = answers[port];
-			var abbr = modules[name];
-			var str = '\t\t' + port + ': ';
-			if (name) {
-				str += '[\'' + name + '\', \'' + abbr + '\']';
-			} else {
-				str += 'null';
-			}
-			return str;
-		}).join(',\n');
+			return { port: port, name: name, abbr: modules[name] };
+		});
 
-		vars.dependencies = ports.map(function(port) {
+		answers.dependencies = ports.map(function(port) {
 			return answers[port];
 		}).filter(function(value, index, self) {
 			return value && self.indexOf(value) === index;
-		}).concat('tesselate').sort().map(function(dep) {
-			return '    "' + dep + '": "*"';
-		}).join(',\n');
+		}).concat('tesselate').sort();
 
 		gulp.src(__dirname + '/templates/**')
-			.pipe(template(vars))
+			.pipe(template(answers))
 			.pipe(conflict('./'))
 			.pipe(gulp.dest('./'))
 			.on('finish', function() {
-				if (process.argv.indexOf('--skip-install') === -1) {
-					gutil.log('Installing...');
-					spawn('npm', ['install'], { stdio: 'inherit' }).on('close', function(code) {
-						if (code === 0) {
-							done();
-							console.log(gutil.colors.green('\nDONE! Connect your Tessel and try running \'gulp run\'\n'));
-						}
-					});
-				}
+				gulp.start(['npm-install'], done);
 			});
 
 	});

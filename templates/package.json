@@ -3,10 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "main": "index.js",
-  "dependencies": {
-<%= dependencies %>
+  "dependencies": {<% dependencies.forEach(function(dependency, index, arr) { %>
+    "<%= dependency %>": "*"<% if (index < arr.length - 1) { %>,<% } %><% }) %>
   },
-  "devDependencies": {
-    "gulp": "*"
-  }
+  "hardware": {}
 }
