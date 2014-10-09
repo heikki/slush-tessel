@@ -37,7 +37,6 @@
     "underscore.string": "^2.3.3"
   },
   "keywords": [
-    "gulp",
     "slushgenerator",
     "tessel",
     "tesselate"
