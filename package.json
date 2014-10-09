@@ -1,7 +1,7 @@
 {
   "name": "slush-tessel",
   "description": "A slush generator for Tessel projects",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "homepage": "https://github.com/heikki/slush-tessel",
   "author": {
     "name": "Heikki Ylönen",
